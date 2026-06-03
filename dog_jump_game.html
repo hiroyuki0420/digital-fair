@@ -2,39 +2,92 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>いぬジャンプゲーム</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>いぬジャンプ（スマホ版）</title>
+
 <style>
-body { text-align:center; font-family:sans-serif; background:skyblue; }
-canvas { border:2px solid black; background:#eef; }
-button { padding:10px 20px; margin-bottom:10px; }
+body { text-align:center; margin:0; background:skyblue; }
+canvas { width:100%; max-width:400px; border:2px solid black; background:#eef; }
+button { padding:15px; margin:10px; }
 </style>
+
 </head>
 <body>
-<h1>いぬジャンプゲーム 🐶</h1>
-<p>クリックでジャンプ！どんどん上に登ろう！</p>
+
+<h2>🐶 いぬジャンプ</h2>
+<p>タップでジャンプ！</p>
+
 <button onclick="startGame()">スタート</button><br>
-<canvas id="game" width="400" height="400"></canvas>
+<canvas id="c" width="400" height="400"></canvas>
+
 <script>
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
-let player, obstacles, velocityY, gravity, score, gameOver;
-function reset(){player={x:200,y:350};velocityY=0;gravity=0.6;obstacles=[];score=0;gameOver=false;}
-function startGame(){reset();loop();}
-function jump(){if(!gameOver){velocityY=-10;}}
-function loop(){if(gameOver) return;
-ctx.clearRect(0,0,canvas.width,canvas.height);
-velocityY+=gravity; player.y+=velocityY;
-if(player.y>380){gameOver=true;return showGameOver();}
-ctx.font='30px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🐶',player.x,player.y);
-if(Math.random()<0.02){const fromLeft=Math.random()<0.5;obstacles.push({x:fromLeft?-30:400,y:Math.random()*300+50,speed:(Math.random()*2+2)*(fromLeft?1:-1)});}
-for(let i=obstacles.length-1;i>=0;i--){let o=obstacles[i];o.x+=o.speed;ctx.fillStyle='red';ctx.fillRect(o.x,o.y,20,20);
-if(Math.abs(player.x-o.x)<20 && Math.abs(player.y-o.y)<20){gameOver=true;return showGameOver();}
-if(o.x<-40 || o.x>440){obstacles.splice(i,1);score++;}}
-ctx.fillStyle='black';ctx.font='16px Arial';ctx.textAlign='left';ctx.fillText('Score: '+score,10,20);
-requestAnimationFrame(loop);} 
-function showGameOver(){ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(0,0,canvas.width,canvas.height);
-ctx.fillStyle='white';ctx.font='24px Arial';ctx.textAlign='center';ctx.fillText('ゲームオーバー',200,200);} 
-window.addEventListener('click',jump);
+const c=document.getElementById("c");
+const ctx=c.getContext("2d");
+
+let p,o=[],vy=0,g=0.6,s=0,over=false;
+
+function startGame(){
+ p={x:200,y:350};
+ o=[]; vy=0; s=0; over=false;
+ loop();
+}
+
+function jump(){ if(!over) vy=-10; }
+
+c.addEventListener("touchstart",e=>{e.preventDefault();jump();});
+c.addEventListener("click",jump);
+
+function loop(){
+ if(over)return;
+
+ ctx.clearRect(0,0,400,400);
+
+ vy+=g;
+ p.y+=vy;
+
+ if(p.y>380){
+  over=true;
+  ctx.fillText("GAME OVER",150,200);
+  return;
+ }
+
+ ctx.font="30px Arial";
+ ctx.fillText("🐶",p.x,p.y);
+
+ if(Math.random()<0.02){
+  let left=Math.random()<0.5;
+  o.push({
+   x:left?-30:400,
+   y:Math.random()*300,
+   s:(Math.random()*2+2)*(left?1:-1)
+  });
+ }
+
+ for(let i=o.length-1;i>=0;i--){
+  let ob=o[i];
+  ob.x+=ob.s;
+
+  ctx.fillStyle="red";
+  ctx.fillRect(ob.x,ob.y,20,20);
+
+  if(Math.abs(ob.x-p.x)<20 && Math.abs(ob.y-p.y)<20){
+   over=true;
+   ctx.fillText("GAME OVER",150,200);
+   return;
+  }
+
+  if(ob.x<-40||ob.x>440){
+   o.splice(i,1);
+   s++;
+  }
+ }
+
+ ctx.fillStyle="black";
+ ctx.fillText("Score:"+s,10,20);
+
+ requestAnimationFrame(loop);
+}
 </script>
+
 </body>
 </html>
