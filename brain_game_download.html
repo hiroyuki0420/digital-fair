@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>脳トレ数字当てゲーム</title>
+<style>
+body { text-align:center; font-family:sans-serif; background:#f0f8ff; }
+button { padding:10px 20px; margin:5px; font-size:16px; }
+.box { font-size:28px; margin:15px; }
+</style>
+</head>
+<body>
+<h1>脳トレ数字当てゲーム 🧠</h1>
+<p>表示された数字を覚えて当てよう！</p>
+<div id="number" class="box"></div>
+<div id="choices"></div>
+<p id="result"></p>
+<button onclick="startGame()">スタート</button>
+<script>
+let answer = 0;
+function startGame() {
+  document.getElementById('result').textContent = '';
+  answer = Math.floor(Math.random() * 100);
+  const numberDiv = document.getElementById('number');
+  numberDiv.textContent = answer;
+  setTimeout(() => {
+    numberDiv.textContent = '???';
+    showChoices();
+  }, 1000);
+}
+function showChoices() {
+  const choicesDiv = document.getElementById('choices');
+  choicesDiv.innerHTML = '';
+  let choices = [answer];
+  while (choices.length < 4) {
+    const n = answer + Math.floor(Math.random()*20 - 10);
+    if (!choices.includes(n)) choices.push(n);
+  }
+  choices.sort(() => Math.random() - 0.5);
+  choices.forEach(n => {
+    const btn = document.createElement('button');
+    btn.textContent = n;
+    btn.onclick = () => checkAnswer(n);
+    choicesDiv.appendChild(btn);
+  });
+}
+function checkAnswer(n) {
+  const result = document.getElementById('result');
+  if (n === answer) {
+    result.textContent = '正解！✨';
+    result.style.color = 'green';
+  } else {
+    result.textContent = '不正解！答えは ' + answer;
+    result.style.color = 'red';
+  }
+}
+</script>
+</body>
+</html>

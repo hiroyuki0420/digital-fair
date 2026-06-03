@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>記憶チャレンジゲーム</title>
+<style>
+body { text-align:center; font-family:sans-serif; background:#eef; }
+.number { font-size:32px; margin:20px; letter-spacing:5px; }
+button { padding:10px 20px; margin:5px; font-size:16px; }
+input { width:40px; font-size:20px; margin:5px; text-align:center; }
+</style>
+</head>
+<body>
+
+<h1>記憶チャレンジゲーム 🧠</h1>
+<p>数字を覚えてどんどん増やそう！</p>
+
+<div id="display" class="number"></div>
+<div id="inputs"></div>
+<p id="result"></p>
+
+<button onclick="startGame()">スタート</button>
+
+<script>
+let sequence = [];
+let level = 1;
+
+function startGame() {
+  level = 1;
+  sequence = [];
+  nextRound();
+}
+
+function nextRound() {
+  document.getElementById('result').textContent = '';
+  document.getElementById('inputs').innerHTML = '';
+
+  sequence.push(Math.floor(Math.random()*10));
+
+  const display = document.getElementById('display');
+  display.textContent = sequence.join(' ');
+
+  setTimeout(() => {
+    display.textContent = '???';
+    showInputs();
+  }, 1200);
+}
+
+function showInputs() {
+  const inputsDiv = document.getElementById('inputs');
+  inputsDiv.innerHTML = '';
+
+  for(let i=0;i<sequence.length;i++){
+    const input = document.createElement('input');
+    input.maxLength = 1;
+    inputsDiv.appendChild(input);
+  }
+
+  const btn = document.createElement('button');
+  btn.textContent = '決定';
+  btn.onclick = checkAnswer;
+
+  inputsDiv.appendChild(document.createElement('br'));
+  inputsDiv.appendChild(btn);
+}
+
+function checkAnswer() {
+  const inputs = document.querySelectorAll('#inputs input');
+  let correct = true;
+
+  inputs.forEach((inp,i)=>{
+    if(parseInt(inp.value) !== sequence[i]) correct=false;
+  });
+
+  const result = document.getElementById('result');
+
+  if(correct){
+    result.textContent = '正解！レベルアップ✨';
+    result.style.color='green';
+    level++;
+    setTimeout(nextRound,1000);
+  } else {
+    result.textContent = 'ゲームオーバー！レベル '+level;
+    result.style.color='red';
+  }
+}
+</script>
+
+</body>
+</html>
