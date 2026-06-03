@@ -2,131 +2,97 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ペンギンシューティング（移動版）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>シューティング</title>
 <style>
-body { text-align:center; font-family:sans-serif; background:#000022; color:white; }
-canvas { border:2px solid white; background:#000022; }
-button { padding:10px 20px; margin-bottom:10px; }
+body { text-align:center; background:#000021; color:white; margin:0; }
+canvas { width:100%; max-width:400px; border:2px solid white; }
+button { padding:15px; margin:10px; }
 </style>
 </head>
 <body>
-<h1>ペンギンシューティング 🐧</h1>
-<p>クリックで発射 / マウス・指で上下移動</p>
+
+<h2>🐧 シューティング</h2>
+<p>タップで撃つ / 指で移動</p>
+
 <button onclick="startGame()">スタート</button><br>
-<canvas id="game" width="400" height="300"></canvas>
+<canvas id="c" width="400" height="300"></canvas>
+
 <script>
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
+const canvas=document.getElementById("c");
+const ctx=canvas.getContext("2d");
 
-let player, bullets, enemies, frame, score, gameOver;
+let p,b=[],e=[],f,s,g;
 
-function reset() {
-  player = { x: 50, y: 150 };
-  bullets = [];
-  enemies = [];
-  frame = 0;
-  score = 0;
-  gameOver = false;
+function reset(){
+ p={x:50,y:150}; b=[]; e=[]; f=0; s=0; g=false;
 }
+function startGame(){reset();loop();}
 
-function startGame() {
-  reset();
-  update();
-}
+function shoot(){if(!g)b.push({x:p.x+20,y:p.y});}
 
-function shoot() {
-  if (gameOver) return;
-  bullets.push({ x: player.x + 20, y: player.y });
-}
-
-// マウス移動
-canvas.addEventListener('mousemove', (e) => {
-  const rect = canvas.getBoundingClientRect();
-  player.y = e.clientY - rect.top;
+canvas.addEventListener("touchmove",ev=>{
+ ev.preventDefault();
+ const r=canvas.getBoundingClientRect();
+ p.y=ev.touches[0].clientY-r.top;
 });
 
-// スマホ対応
-canvas.addEventListener('touchmove', (e) => {
-  e.preventDefault();
-  const rect = canvas.getBoundingClientRect();
-  player.y = e.touches[0].clientY - rect.top;
+canvas.addEventListener("touchstart",ev=>{
+ ev.preventDefault(); shoot();
 });
 
-function update() {
-  if (gameOver) return;
+canvas.addEventListener("mousemove",ev=>{
+ const r=canvas.getBoundingClientRect();
+ p.y=ev.clientY-r.top;
+});
 
-  frame++;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+canvas.addEventListener("click",shoot);
 
-  // プレイヤー
-  ctx.font = '30px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('🐧', player.x, player.y);
+function loop(){
+ if(g)return;
+ f++;
+ ctx.clearRect(0,0,400,300);
 
-  // 弾
-  for (let i = bullets.length - 1; i >= 0; i--) {
-    let b = bullets[i];
-    b.x += 6;
+ ctx.font="30px Arial";
+ ctx.fillText("🐧",p.x,p.y);
 
-    ctx.fillStyle = 'yellow';
-    ctx.fillRect(b.x, b.y - 2, 10, 4);
+ for(let i=b.length-1;i>=0;i--){
+  b[i].x+=6;
+  ctx.fillStyle="yellow";
+  ctx.fillRect(b[i].x,b[i].y,8,3);
+  if(b[i].x>400)b.splice(i,1);
+ }
 
-    if (b.x > canvas.width) bullets.splice(i, 1);
+ if(f%60===0){
+  e.push({x:400,y:Math.random()*260,s:2+Math.random()*2});
+ }
+
+ for(let i=e.length-1;i>=0;i--){
+  let o=e[i]; o.x-=o.s;
+  ctx.fillText("👾",o.x,o.y);
+
+  if(Math.abs(o.x-p.x)<20 && Math.abs(o.y-p.y)<20){
+   g=true;
+   ctx.fillText("GAME OVER",150,150);
+   return;
   }
 
-  // 敵生成
-  if (frame % 60 === 0) {
-    enemies.push({
-      x: canvas.width,
-      y: Math.random() * 260 + 20,
-      speed: 2 + Math.random() * 2
-    });
+  for(let j=b.length-1;j>=0;j--){
+   let bb=b[j];
+   if(Math.abs(bb.x-o.x)<15 && Math.abs(bb.y-o.y)<15){
+    e.splice(i,1); b.splice(j,1); s++; break;
+   }
   }
 
-  // 敵処理
-  for (let i = enemies.length - 1; i >= 0; i--) {
-    let e = enemies[i];
-    e.x -= e.speed;
+  if(o.x<-30)e.splice(i,1);
+ }
 
-    ctx.fillText('👾', e.x, e.y);
+ ctx.fillStyle="white";
+ ctx.fillText("Score:"+s,10,20);
 
-    // プレイヤー衝突
-    if (Math.abs(e.x - player.x) < 20 && Math.abs(e.y - player.y) < 20) {
-      gameOver = true;
-      ctx.fillStyle = 'rgba(0,0,0,0.7)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'white';
-      ctx.font = '24px Arial';
-      ctx.fillText('ゲームオーバー', 200, 130);
-      ctx.fillText('Score: ' + score, 200, 170);
-      return;
-    }
-
-    // 弾と当たり
-    for (let j = bullets.length - 1; j >= 0; j--) {
-      let b = bullets[j];
-      if (Math.abs(b.x - e.x) < 15 && Math.abs(b.y - e.y) < 15) {
-        enemies.splice(i, 1);
-        bullets.splice(j, 1);
-        score++;
-        break;
-      }
-    }
-
-    if (e.x < -30) enemies.splice(i, 1);
-  }
-
-  // スコア
-  ctx.fillStyle = 'white';
-  ctx.font = '16px Arial';
-  ctx.textAlign = 'left';
-  ctx.fillText('Score: ' + score, 10, 20);
-
-  requestAnimationFrame(update);
+ requestAnimationFrame(loop);
 }
-
-window.addEventListener('click', shoot);
 </script>
+
 </body>
 </html>
