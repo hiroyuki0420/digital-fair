@@ -2,22 +2,41 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ゲームコーナー</title>
 
 <style>
 body {
   text-align: center;
   font-family: sans-serif;
+  margin: 0;
   background: #eef;
 }
-button {
-  display: block;
-  width: 220px;
-  margin: 10px auto;
-  padding: 15px;
-  font-size: 18px;
-  cursor: pointer;
+
+/* タイトル */
+h1 {
+  margin-top: 15px;
 }
+
+/* ボタン */
+.game-btn {
+  display: block;
+  width: 90%;
+  max-width: 300px;
+  margin: 12px auto;
+  padding: 18px;
+  font-size: 20px;
+  border: none;
+  border-radius: 10px;
+}
+
+/* 色分け */
+.jump { background: #4CAF50; color: white; }
+.shoot { background: #2196F3; color: white; }
+.dog { background: #FF9800; color: white; }
+.cross { background: #9C27B0; color: white; }
+.memory { background: #F44336; color: white; }
+
 a {
   text-decoration: none;
 }
@@ -27,28 +46,29 @@ a {
 
 <body>
 
-<h1>ゲームコーナー 🎮</h1>
-<p>好きなゲームを選んでね！</p>
+<h1>🎮 ゲームコーナー</h1>
+<p>タップしてあそぼう！</p>
 
 <a href="penguin_jump_game.html">
-  <button>🐧 ジャンプゲーム</button>
+  <button class="game-btn jump">🐧 ジャンプ</button>
 </a>
 
 <a href="penguin_shooting_move.html">
-  <button>🔫 シューティング</button>
+  <button class="game-btn shoot">🔫 シューティング</button>
 </a>
 
 <a href="dog_jump_game.html">
-  <button>🐶 いぬジャンプ</button>
+  <button class="game-btn dog">🐶 いぬジャンプ</button>
 </a>
 
 <a href="crossword_game.html">
-  <button>🧩 クロスワード</button>
+  <button class="game-btn cross">🧩 クロスワード</button>
 </a>
 
 <a href="memory_game_final.html">
-  <button>🧠 記憶ゲーム</button>
+  <button class="game-btn memory">🧠 記憶ゲーム</button>
 </a>
 
 </body>
 </html>
+``
