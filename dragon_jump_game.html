@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ドラゴンジャンプゲーム</title>
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+  background: linear-gradient(#000033, #330066);
+}
+#game {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+#dragon {
+  position: absolute;
+  bottom: 50px;
+  left: 50px;
+  font-size: 40px;
+}
+.obstacle {
+  position: absolute;
+  bottom: 50px;
+  right: -50px;
+  font-size: 30px;
+}
+#score {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: white;
+}
+#gameOver {
+  position: absolute;
+  top: 40%;
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-size: 28px;
+  display: none;
+}
+button {
+  font-size: 18px;
+  padding: 10px 20px;
+}
+</style>
+</head>
+
+<body>
+<div id="game">
+  <div id="dragon">🐉</div>
+  <div id="score">Score: 0</div>
+
+  <div id="gameOver">
+    ゲームオーバー！<br>
+    <button onclick="location.reload()">もう一回</button>
+  </div>
+</div>
+
+<script>
+const dragon = document.getElementById("dragon");
+const scoreText = document.getElementById("score");
+const gameOverUI = document.getElementById("gameOver");
+
+let jumping = false;
+let velocity = 0;
+let score = 0;
+let baseSpeed = 5;
+let isGameOver = false;
+
+// ✅ ジャンプ（タッチ・キー・クリック対応）
+function jump() {
+  if (!jumping && !isGameOver) {
+    jumping = true;
+    velocity = 16;
+  }
+}
+
+document.addEventListener("touchstart", jump);
+document.addEventListener("keydown", jump);
+document.addEventListener("click", jump);
+
+// ✅ 障害物生成（ランダムタイミング）
+function createObstacle() {
+  if (isGameOver) return;
+
+  const obstacle = document.createElement("div");
+  obstacle.classList.add("obstacle");
+  obstacle.textContent = "🔥";
+  document.getElementById("game").appendChild(obstacle);
+
+  let position = window.innerWidth;
+
+  // ✅ ランダム速度
+  let speed = baseSpeed + Math.random() * 5;
+
+  const move = setInterval(() => {
+
+    if (isGameOver) {
+      clearInterval(move);
+      obstacle.remove();
+      return;
+    }
+
+    position -= speed;
+    obstacle.style.right = (window.innerWidth - position) + "px";
+
+    const dragonRect = dragon.getBoundingClientRect();
+    const obsRect = obstacle.getBoundingClientRect();
+
+    if (
+      dragonRect.right > obsRect.left &&
+      dragonRect.left < obsRect.right &&
+      dragonRect.bottom > obsRect.top
+    ) {
+      isGameOver = true;
+      gameOverUI.style.display = "block";
+      clearInterval(move);
+    }
+
+    if (position < -50) {
+      obstacle.remove();
+      clearInterval(move);
+      score++;
+      scoreText.textContent = "Score: " + score;
+      baseSpeed += 0.2;
+    }
+
+  }, 20);
+
+  // ✅ 次の出現タイミングをランダムに
+  setTimeout(createObstacle, 800 + Math.random() * 1500);
+}
+
+// 最初の呼び出し
+createObstacle();
+
+// ✅ メインループ
+function gameLoop() {
+  if (jumping) {
+    velocity -= 0.8;
+    let bottom = parseInt(dragon.style.bottom.replace("px", "")) || 50;
+
+    bottom += velocity;
+    if (bottom <= 50) {
+      bottom = 50;
+      jumping = false;
+    }
+
+    dragon.style.bottom = bottom + "px";
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+gameLoop();
+</script>
+</body>
+</html>
