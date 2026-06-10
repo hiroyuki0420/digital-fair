@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ねこメモリーゲーム</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background: linear-gradient(#ffeeee, #ffccff);
+}
+
+#cat {
+  font-size: 60px;
+  margin-top: 20px;
+}
+
+#numbers {
+  font-size: 40px;
+  margin: 20px;
+}
+
+button {
+  font-size: 20px;
+  margin: 10px;
+  padding: 10px 20px;
+}
+
+input {
+  font-size: 20px;
+  padding: 5px;
+}
+
+#level {
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+#result {
+  font-size: 22px;
+  margin-top: 10px;
+}
+
+/* ゲーム画面は最初非表示 */
+#gameArea {
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="cat">🐱</div>
+<h2>ねこメモリーゲーム</h2>
+
+<!-- スタートボタン -->
+<button onclick="startGame()">スタート！</button>
+
+<!-- ゲーム本体 -->
+<div id="gameArea">
+
+  <div id="level">レベル: 1</div>
+
+  <div id="numbers"></div>
+
+  <input id="answer" placeholder="おぼえた数字を入力">
+  <br>
+
+  <button onclick="checkAnswer()">こたえる</button>
+
+  <div id="result"></div>
+
+</div>
+
+<script>
+let sequence = [];
+let level = 3;
+let stage = 1;
+
+// ✅ スタート処理
+function startGame() {
+  document.getElementById("gameArea").style.display = "block";
+  showNumbers();
+}
+
+// ✅ 数字表示
+function showNumbers() {
+  sequence = [];
+
+  for (let i = 0; i < level; i++) {
+    sequence.push(Math.floor(Math.random() * 10));
+  }
+
+  document.getElementById("level").innerText = "レベル: " + stage;
+  document.getElementById("numbers").innerText = sequence.join(" ");
+
+  setTimeout(() => {
+    document.getElementById("numbers").innerText = "？";
+  }, 2000);
+}
+
+// ✅ 回答チェック
+function checkAnswer() {
+  const input = document.getElementById("answer").value.split("").map(Number);
+  const result = document.getElementById("result");
+
+  if (JSON.stringify(input) === JSON.stringify(sequence)) {
+    result.innerText = "せいかい！😺";
+    level++;
+    stage++;
+  } else {
+    result.innerText = "ざんねん！🙀 はじめからやりなおし！";
+    level = 3;
+    stage = 1;
+  }
+
+  document.getElementById("answer").value = "";
+
+  // ✅ メッセージを自動で消す
+  setTimeout(() => {
+    result.innerText = "";
+  }, 1000);
+
+  setTimeout(showNumbers, 1200);
+}
+</script>
+
+</body>
+</html>
